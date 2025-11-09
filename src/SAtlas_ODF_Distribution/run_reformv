@@ -1,0 +1,51 @@
+#! /bin/sh
+##################### RUN SCRIPT FOR REFORMV ########################
+#.... INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DEFINE THE HOME DIRECTORIES
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+DIR=`pwd`
+
+#.... TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo USAGE: run_reformv input_model wave
+	echo EXAMPLE: run_reformv asunodfnew 640
+	exit 1
+else
+	MODEL=$1
+	WAVE=$2
+	MODEL_WAVE=$1_w$2
+fi
+
+#.... IF NEEDED< ESTABLISH THIS SYMBOLIC LINK
+
+if [ $DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/reform.exe  reform.exe
+fi
+
+ln -s  $DIR/specsyn_file31.$MODEL_WAVE          $DIR/reform.file31
+
+V_FILES=`ls vfield_m???_p???_r???.$MODEL_WAVE`
+
+for file in $V_FILES
+	do ln -s $DIR/$file                     $DIR/reform.file32
+		$DIR/reform.exe
+		mv $DIR/reform.print            $DIR/reform_$file
+		rm $DIR/reform.file32
+done
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $DIR != $XCODE_DIR ]; then
+	rm $DIR/reform.exe
+fi
+
+rm $DIR/reform.file31
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+mv $DIR/reform.print                          $DIR/reform_print.$MODEL_WAVE
+

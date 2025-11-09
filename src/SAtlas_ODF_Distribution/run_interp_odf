@@ -1,0 +1,18 @@
+# run_interp_odf FILE1 FILE2 VOUT
+# INPUT:
+#   1 = odf_file 1
+#   2 = odf_file 2
+#   3 = the variable for the interpolated file
+#
+if [ $# -lt 3 ]; then
+	echo "specify odf_file1, odf_file2 and varout"
+	exit 1
+else
+	echo $1 > ./file1
+	echo $2 > ./file2
+	echo $3 > ./varout
+	./interp_odf.exe
+	rm ./file1
+	rm ./file2
+	rm ./varout
+fi

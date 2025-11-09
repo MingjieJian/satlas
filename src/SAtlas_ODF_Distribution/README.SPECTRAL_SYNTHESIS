@@ -1,0 +1,172 @@
+2019 JUNE
+
+The process of calculating synthetic spectra for an existing model 
+atmosphere can be done in one step, which is the approach taken by 
+Robert Kurucz, but the approach used here is to break the calculation 
+into a series of steps to avoid repeating steps when that is not required.
+
+1. synbeg.for
+   This program is compiled using the Makefile with the command 
+   "make synbeg"
+
+   The process starts using the program synbeg to select spectral lines 
+   for a particular wavelength region, say 400 to 450 nm.  The line 
+   files, available on the web site of Robert Kurucz, are:
+      http://kurucz.harvard.edu/linelists/gfnew/gfall08oct17.dat
+      http://kurucz.harvard.edu/linelists/linesmol/c2ax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/c2ba.asc
+      http://kurucz.harvard.edu/linelists/linesmol/c2da.asc
+      http://kurucz.harvard.edu/linelists/linesmol/c2ea.asc
+      http://kurucz.harvard.edu/linelists/linesmol/chax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/chbx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/chcx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/cnax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/cnbx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/coax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/coxx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/h2bx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/h2cx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/h2xx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/hdxx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/mghax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/mghbx.asc
+      http://kurucz.harvard.edu/linelists/linesmol/nh.asc
+      http://kurucz.harvard.edu/linelists/linesmol/ohnew.asc
+      http://kurucz.harvard.edu/linelists/linesmol/sihax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/sioax.asc
+      http://kurucz.harvard.edu/linelists/linesmol/sioex.asc
+      http://kurucz.harvard.edu/linelists/linesmol/sioxx.asc
+      http://kurucz.harvard.edu/molecules/tio/tioshcwenke.bin
+
+   The Kurucz line lists above with extension .asc or .dat are ascii 
+   files.  Searching them requires a sequential approach, starting at 
+   the first line and reading each line in turn until the spectral 
+   region of interest is reached.  To search the line lists more rapidly, 
+   the files have been rewritten as binary direct access files.
+
+   The Kurucz file gfall08oct17.dat, which contains all the atomic and 
+   ionic lines, is read by the program gfall2bin.for, which is based on 
+   Kurucz's program RGFALL.FOR, and the data are written out into the 
+   direct access binary file gfall.bin.
+
+   Most of the molecular line files, such as c2ax.asc, are converted 
+   from ascii to direct access binary files using the program mol2bin.for,
+   which is based on Kurucz's program MOLBIN.FOR.
+
+   The h2--.asc files are read and converted to direct access binary 
+   files using molh2xx2bin.for.
+
+   After compiling each of the conversion programs, the line list files 
+   are converted to binary direct access files by using the script 
+   run_mol2bin
+
+   Kurucz's file tioschwenke.bin is already binary, and the original 
+   file is read in a subroutine of synbeg.
+
+   The order in which these line lists are searched is set inside the 
+   program synbeg.for
+
+   Program synbeg is run by using the script run_synbeg, which creates  
+   symbolic links between the working directory, the location of the 
+   executable program synbeg.exe, and the line list directory.  Executing 
+   the script by ./run_synbeg will indicate that the beginning 
+   wavelength must be supplied , such as ./run_synbeg 0400.  The 
+   wavelength is used only as a label for the output files.
+
+   Program synbeg also reads the file synbeg.inputfile to get 
+   instructions.  This file:
+   - supplies the beginning and ending wavelengths of the region to be
+     synthesized.
+   - indicates which line lists to be used by uncommenting the line 
+     that begins with the word "read".  Each line list has the beginning 
+     and ending wavelengths (these are just for information).  Knowing 
+     the wavelength region of interest, lists that have no lines in
+     that region can be commented out.  Also, molecular lines can be 
+     commented out when doing a star too hot to have molecules.
+
+   The output of synbeg is a listing of the lines used from each line 
+   list, and a summary file of the number of lines used from each line 
+   list and the total number of lines from all the lists.
+
+   Once it has been created, the output of synbeg can be used for the
+   synthesis of spectra for different stellar atmospheres as long as 
+   the physical properties of the atmospheres are similar so that the 
+   same atoms/ions/molecules are present.
+
+2. xnfpelsyn_main.for
+   This program is compiled using the Makefile with the command 
+   "make xnfpelsyn"
+
+   The program xnfpelsyn calculates the populations of all the atoms, 
+   ions and molecules for every depth of a particular model atmosphere.
+
+   The script run_xnfpelsyn creates symbolic links to the directory 
+   where the executable program, xnfpelsyn.exe, is located, to the 
+   directory where the model atmosphere file is located, and to manage 
+   the output files.  The program uses two data files, continua.dat and 
+   molecules.dat, so symbolic links to these files are also created. 
+   Executing ./run_xnfpelsyn will ask for the name of the model file.
+
+   There is also an input file, xnfpelsyn.inputfile that contains 
+   instructions for the program.
+
+   NOTE that xnfpelsyn is only concerned with the populations for a 
+   particular model atmosphere, so it is run without reference to any 
+   line list.
+
+3. synthe_main.for
+   This is compiled using the Makefile with the command "make synthe"
+
+   The third step in the process is to use the populations from 
+   xnfpelsyn to select the lines culled by synbeg that will be 
+   important for the model.  This is done by the program synthe.exe
+
+   The script run_synthe controls the execution.  Running ./run_synthe 
+   will ask for the name of the model and the starting wavelength of 
+   the interval.  These will be used as labels to find the correct 
+   files and to identify the output.  The run_synthe script creates the 
+   symbolic links for the input files and renames the output files with 
+   the labels.
+
+   The program also reads the file synthe.inputfile, which contains only 
+   the spectral resolution.  Therefore, existing line files and model 
+   populations can be reprocessed for different spectral resolutions 
+   without recreating the line files or the populations.
+
+4. specsyn_main.for
+   This is compiled using the Makefile with the command "make specsyn"
+
+   The program specsyn computes the synthetic spectrum using the file 
+   created by synthe.  This is controlled by the script run_specsyn. 
+   Execution of ./run_specsyn asks for the model name and the starting 
+   wavelength to identify the correct input files.  The script also 
+   creates the symbolic links and renames the output files.
+
+   The input file specsyn.inputfile contains instructions for the program.
+   The options in the inputfile can select computing the spectrum as 
+   flux or as intensities, and these can be done without repeating 
+   synbeg, xnfpelsyn or synthe.
+
+5. reform_f.for
+   This is compiled using the Makefile with the command "make reform_f"
+
+   The program reform_f reads the binary flux spectrum file created by 
+   specsyn and converts it to ascii.  This is managed by the script 
+   run_reform_f.
+
+6. reform_i.for
+   This is compiled using the Makefile with the command "make reform_i"
+
+   The program reform_i reads the binary intensity spectrum file created 
+   by specsyn and converts it to ascii.  This is managed by the script 
+   run_reform_i.
+
+7. list_lines.for
+   This is compiled using the Makefile with the command "make list_lines"
+
+   The final program in the sequence is list_lines, which produces 
+   a listing of the lines in the spectral region, giving their core 
+   depths.  This is managed by the script run_list_lines, and there 
+   is a parameter giving the shallowest line core to keep.
+   
+

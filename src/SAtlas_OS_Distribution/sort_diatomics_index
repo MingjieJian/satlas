@@ -1,0 +1,9 @@
+#! /bin/sh
+# SCRIPT TO SORT THE INDEX FILE OF DIATOMICS.PCK
+# EACH LINE HAS TWO ENTRIES: RECORD_NUMBER WAVELENGTH
+
+# -g = GENERAL NUMERICAL SORT
+# -k 2 = SORT ON THE SECOND FIELD, WHICH IS THE WAVELENGTH
+# -o diatomics.pck_index_sorted = THE OUTPUT FILE
+
+sort -g -k 2 -o diatomics.pck_index_sorted diatomics.pck_index

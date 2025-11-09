@@ -1,0 +1,36 @@
+read pp_model   ! THIS SETS UP THE FILE FROM WHICH THE PP MODEL IS READ
+#read sp_model   ! THIS SETS UP THE FILE FROM WHICH THE SP MODEL IS READ
+#abundance scale -1.5
+read rosseland
+#vturb 2.0 km/s
+# FOR COMPUTING FLUX WITH THIS MODEL
+#correction off
+molecules on
+frequencies big
+#frequencies lit
+# Sun
+scale 72 tau1lg -6.875 step_lg 0.125 new_lum 1.0 new_mass 1.0 new_rad 1.0
+# red giant Teff = 4000 log g = 1.0
+#scale 72 tau1lg -6.875 step_lg 0.125 new_lum 600 new_mass 1.0 new_rad 50.0
+# Arcturus Teff = 4300 log g = 1.6
+#scale 72 tau1lg -6.875 step_lg 0.125 new_lum 187.0 new_mass 0.7 new_rad 25.0
+iterations 30
+#iterations 60
+# OUTPUT INSTRUCTIONS MUST COME AFTER SPECIFYING THE NUMBER OF ITERATIONS
+print 1 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 2
+#     0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 2
+#punch 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+#      0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+#surf flux 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+#          0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+#
+# SPECIFY WHICH ITERATIONS WILL OUTPUT INTENSITIES
+#surface inten 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+# IF INTENSITIES ARE BEING OUTPUT, SPECIFY THE n_mu VALUE
+# OPTION ONE - n_mu > 20, satlas COMPUTES THE mu VALUES IN EQUAL STEPS
+#              n_mu Xn vw from 21 to 1000
+#100 ! COMPUTES mu VALUES WITH STEPS OF 1/100 = 0.01 FROM 1.00 TO 0.01
+# OPTION TWO - INPUT n_mu <= 20, satlas READS THE mu VALUES FROM inputfile
+#12 1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 0.05 0.01 ! SPECIFY MUS
+begin
+end

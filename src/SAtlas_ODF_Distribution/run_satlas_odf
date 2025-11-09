@@ -1,0 +1,158 @@
+#! /bin/bash
+######################## RUN SCRIPT FOR SATLAS_ODF #####################
+# 2017 JUN - I USE THE CASTELLI ODF FILES BECAUSE:
+#               THEY ARE MORE CURRENT THAN THE KURUCZ ODF FILES
+#               I AM UNABLE TO READ THE KURUCZ ODFS
+#          - THE CASTELLI ODFS ARE FROM CONVERTED THEIR EXPLICIT ARRAY ORDER 
+#            AND FORMAT TO THE COMPLIER'S INTRINSIC ARRAY ELEMENT ORDER
+#            AND FORMAT IN THE INTERNAL SUBROUTINE open_odf IN readin
+
+# INPUT TO THE SCRIPT:
+#    1 = COMPOSITION OF THE ODF AND ROSSELAND OPACITY
+#    2 = STEP SIZE OF THE ODF
+#    3 = MODEL - NOTE: THE COMPOSITION IN THE MODEL'S NAME NEED NOT = ODF COMP
+
+# THIS IS DESIGNED TO COMPUTE ONE MODEL AT A TIME, NOT A GRID OF MODELS
+
+# DIRECTORIES - EDIT FOR ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+MODEL_DIR=/home/pub/Grids/Castelli
+#MODEL_DIR=/home/pub/Grids/Kurucz
+#MODEL_DIR=$(pwd) # THE CURRENT DIRECTORY
+
+ODF_DIR=/home/pub/ODF/Castelli
+###ODF_DIR=/home/pub/ODF/Kurucz ## CANNOT READ
+
+ROSS_DIR=/home/pub/Rosseland/Castelli # FOR CONSISTENCY WITH ODFS
+###ROSS_DIR=/home/pub/Rosseland/Kurucz
+
+WORKING_DIR=$(pwd) # THE CURRENT DIRECTORY
+
+# TEST TO SEE IF THERE ARE THE CORRECT NUMBER OF ARGUMENTS
+
+if [ $# -lt 3 ]; then
+	echo "USAGE:   run_satlas_odf comp odf_step input_model"
+	echo "EXAMPLE: PLANE-PARALLEL MODEL"
+	echo "         run_satlas_odf p00  big      ap00t5777g44377k1odfnew"
+	echo "EXAMPLE: SPHERICAL MODEL"
+	echo "         run_satlas_odf p00  big      ap00k2_L1.4_M1.5_R1.5"
+	exit 1
+else
+# INPUT MODEL - EXTENSION CHANGED FROM .dat TO .mdl
+	INPUT_MODEL=$3".mdl"
+
+# CREATE "LABEL" FILES IN THE WORKING DIRECTORY TO BE READ IN SATLAS
+	echo $1 > $WORKING_DIR/composition
+	echo $2 > $WORKING_DIR/odf_step
+	echo $3 > $WORKING_DIR/input_model_name
+	echo $ODF_DIR > $WORKING_DIR/odf_dir
+	echo $ROSS_DIR > $WORKING_DIR/ross_dir
+
+# CONSTRUCT ODF NAME
+	ODF0=$1$2"0.bdf"
+	ODF1=$1$2"1.bdf"
+	ODF2=$1$2"2.bdf"
+	ODF4=$1$2"4.bdf"
+	ODF8=$1$2"8.bdf"
+
+# ROSSELAND FILE ENDING IN .ross IS THE OLDER ONE FROM THE CDROM
+#	ROSS=kap$1.ross
+# ROSSELAND FILE ENDING IN .ros IS CASTELLI'S UPDATE >= 2012FEB WITH
+#   KURUCZ'S NEW H2O
+	ROSS="kap"$1".ros"
+fi
+
+# ECHO OUT THE FILE NAMES
+
+echo INPUT MODEL = $MODEL_DIR/$INPUT_MODEL
+echo ODF0 = $ODF_DIR/$ODF0
+echo ODF1 = $ODF_DIR/$ODF1
+echo ODF2 = $ODF_DIR/$ODF2
+echo ODF4 = $ODF_DIR/$ODF4
+echo ODF8 = $ODF_DIR/$ODF8
+echo ROSS = $ROSS_DIR/$ROSS
+
+# IF NEEDED, ESTABLISH SYMBOLIC LINKS
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/satlas_odf.exe $WORKING_DIR/satlas_odf.exe
+	ln -s $CODE_DIR/molecules.dat  $WORKING_DIR/molecules.dat
+fi
+
+# THESE LINKS ARE ALWAYS NEEDED
+
+ln -s $ODF_DIR/$ODF0                   $WORKING_DIR/odf_file.0
+ln -s $ODF_DIR/$ODF1                   $WORKING_DIR/odf_file.1
+ln -s $ODF_DIR/$ODF2                   $WORKING_DIR/odf_file.2
+ln -s $ODF_DIR/$ODF4                   $WORKING_DIR/odf_file.4
+ln -s $ODF_DIR/$ODF8                   $WORKING_DIR/odf_file.8
+ln -s $MODEL_DIR/$INPUT_MODEL          $WORKING_DIR/model_file
+
+# NOTE, THIS ASSUMES THAT A COPY OF THE INPUTFILE IS LOCATED IN THE
+# WORKING DIRECTORY
+
+cp $WORKING_DIR/satlas_odf.inputfile   $WORKING_DIR/input_file
+
+# THE CODE'S INTERNAL ROSSELAND OPACITY TABLE IS SOLAR COMPOSITION
+# 2012 FEB - REPLACED THE INTERNAL ROSSELAND TABLE WITH CASTELLI'S
+# WHEN COMPUTING A NON-SOLAR COMPOSITION OR FOR MODELS WHERE THE "SOLAR"
+# COMPOSITION HAS BEEN CHANGED, USE AN EXTERNAL ROSSELAND FILE
+
+ln -s $ROSS_DIR/$ROSS                  $WORKING_DIR/ross_file
+
+# EXECUTION
+
+$WORKING_DIR/satlas_odf.exe
+
+# REMOVE THESE "LABEL" FILES
+
+rm $WORKING_DIR/composition
+rm $WORKING_DIR/input_model_name
+rm $WORKING_DIR/odf_dir
+rm $WORKING_DIR/odf_step
+rm $WORKING_DIR/ross_dir
+
+# ALWAYS REMOVE THESE SYMBOLIC LINKS
+
+rm $WORKING_DIR/input_file
+rm $WORKING_DIR/model_file
+rm $WORKING_DIR/odf_file.0
+rm $WORKING_DIR/odf_file.1
+rm $WORKING_DIR/odf_file.2
+rm $WORKING_DIR/odf_file.4
+rm $WORKING_DIR/odf_file.8
+rm $WORKING_DIR/ross_file
+
+# IF NEEDED, REMOVE THESE SYMBOLIC LINKS
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/satlas_odf.exe
+	rm $WORKING_DIR/molecules.dat
+fi
+
+# READ THE OUTPUT FILE NAME CREATED IN SATLAS
+
+OUTPUT_MODEL=$(cat output_model_name)
+
+echo OUTPUT_MODEL = $OUTPUT_MODEL
+
+rm $WORKING_DIR/output_model_name
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+if [ -f $WORKING_DIR/print_file ]; then
+	mv $WORKING_DIR/print_file     $WORKING_DIR/$OUTPUT_MODEL".print"
+fi
+
+if [ -f $WORKING_DIR/punch_file ]; then
+	mv $WORKING_DIR/punch_file     $WORKING_DIR/$OUTPUT_MODEL".model"
+fi
+
+if [ -f $WORKING_DIR/surf_file ]; then
+	mv $WORKING_DIR/surf_file      $WORKING_DIR/$OUTPUT_MODEL".surf"
+fi
+
+echo -ne '\a'
+

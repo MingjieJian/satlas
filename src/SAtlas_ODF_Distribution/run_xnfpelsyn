@@ -1,0 +1,68 @@
+#! /bin/bash
+######################### RUN SCRIPT FOR XNFPELSYN ######################
+# INPUT TO THE SCRIPT: 1 = MODEL
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code/
+
+MODEL_DIR=$(pwd) # LOCATION OF SPHERICAL MODEL ATMOSPHERE
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 1 ]; then
+	echo "USAGE:   run_xnfpelsyn model-name"
+	echo "EXAMPLE: run_xnfpelsyn ap00k1_L150_M1.0_R25.0"
+	exit
+else
+	MODEL=$1
+fi
+
+# ESTABLISH THESE SYMBOLIC LINKS, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/xnfpelsyn.exe    $WORKING_DIR/xnfpelsyn.exe
+	ln -s $CODE_DIR/continua.dat     $WORKING_DIR/continua.dat
+	ln -s $CODE_DIR/molecules.dat    $WORKING_DIR/molecules.dat
+fi
+
+# THIS LINK IS ALWAYS NEEDED
+
+ln -s $MODEL_DIR/$MODEL".mdl"            $WORKING_DIR/model_file
+
+# NOTE, THIS ASSUMES THAT A COPY OF THE INPUTFILE IS RESIDENT IN THE
+# DIRECTORY FROM WHICH THIS SCRIPT IS BEING RUN
+
+cp $WORKING_DIR/xnfpelsyn.inputfile      $WORKING_DIR/xnfpelsyn.input
+
+# EXECUTION
+
+$WORKING_DIR/xnfpelsyn.exe
+
+# REMOVE THE SYMBOLIC LINKS
+
+rm $WORKING_DIR/xnfpelsyn.input
+rm $WORKING_DIR/model_file
+
+# IF NEEDED, REMOVE THESE SYMBOLIC LINKS
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/xnfpelsyn.exe
+	rm $WORKING_DIR/continua.dat
+	rm $WORKING_DIR/molecules.dat
+fi
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+if [ -f $WORKING_DIR/xnfpelsyn.print ]; then
+	mv $WORKING_DIR/xnfpelsyn.print  $WORKING_DIR/xnfpelsyn_print.$MODEL
+fi
+
+if [ -f $WORKING_DIR/xnfpelsyn.file20 ]; then
+	mv $WORKING_DIR/xnfpelsyn.file20 $WORKING_DIR/xnfpelsyn_file20.$MODEL
+fi
+
+echo -ne '\a'
+

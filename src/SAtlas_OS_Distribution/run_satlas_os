@@ -1,0 +1,109 @@
+#! /bin/bash
+# ###################### RUN SCRIPT FOR SATLAS_OS ######################
+# INPUT TO THE SCRIPT: 1 = MODEL
+
+# THIS IS DESIGNED TO COMPUTE ONE MODEL AT A TIME, NOT A GRID OF MODELS
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_OS/Code
+
+MODEL_DIR=/home/pub/Grids/Castelli
+#MODEL_DIR=/home/pub/Grids/Kurucz
+#MODEL_DIR=$(pwd) # THE CURRENT DIRECTORY
+
+LINE_DIR=/home/pub/Llists
+
+WORKING_DIR=$(pwd) # THE CURRENT DIRECTORY
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 1 ]; then
+	echo "USAGE:   run_satlas_os input_model"
+	echo "EXAMPLE: run_satlas_os ap00k2_t05500g40"
+	echo "OR"
+	echo "EXAMPLE: run_satlas_os ap00k2_L1.5_M1.5_R1.5"
+	exit 1
+else
+	echo 
+	echo OUTPUT FROM THE RUN FILE
+	echo 
+
+# INPUT MODEL - EXTENSION CHANGED FROM .dat TO .mdl
+	INPUT_MODEL=$1".mdl"
+fi
+
+echo INPUT MODEL = $MODEL_DIR/INPUT_MODEL
+
+# IF NEEDED, ESTABLISH SYMBOLIC LINKS
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/satlas_os.exe  $WORKING_DIR/satlas_os.exe
+	ln -s $CODE_DIR/molecules.dat  $WORKING_DIR/molecules.dat
+fi
+
+# THESE LINKS ARE ALWAYS NEEDED
+
+ln -s $LINE_DIR/gfallnlte.dat          $WORKING_DIR/gfallnlte_file
+#ln -s $LINE_DIR/diatomic.dat          $WORKING_DIR/diatomics_file
+ln -s $LINE_DIR/diatomics.pck_sorted   $WORKING_DIR/diatomics_file
+ln -s $LINE_DIR/h2ofastfix.bin         $WORKING_DIR/h2o_file
+ln -s $LINE_DIR/highlines.dat          $WORKING_DIR/highlines_file
+ln -s $LINE_DIR/lowlines.dat           $WORKING_DIR/lowlines_file
+ln -s $MODEL_DIR/$MODEL.mdl            $WORKING_DIR/model_file
+#ln -s $LINE_DIR/tiolines.dat          $WORKING_DIR/tiolines_file
+ln -s $LINE_DIR/tioschwenke.bin        $WORKING_DIR/tiolines_file
+
+# NOTE, THIS ASSUMES THAT A COPY OF THE INPUTFILE IS LOCATED IN THE
+# DIRECTORY WHERE THIS SCRIPT IS BEING RUN
+
+cp $WORKING_DIR/satlas_os.inputfile    $WORKING_DIR/input_file
+
+# EXECUTION
+
+$WORKING_DIR/satlas_os.exe
+
+# ALWAYS REMOVE THESE SYMBOLIC LINKS
+
+rm $WORKING_DIR/diatomics_file
+rm $WORKING_DIR/h2o_file
+rm $WORKING_DIR/highlines_file
+rm $WORKING_DIR/input_file
+rm $WORKING_DIR/lowlines_file
+rm $WORKING_DIR/model_file
+rm $WORKING_DIR/nltelines_file
+rm $WORKING_DIR/tiolines_file
+
+# IF NEEDED, REMOVE THESE SYMBOLIC LINKS
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/satlas_os.exe
+	rm $WORKING_DIR/molecules.dat
+fi
+
+# READ THE NEW OUTPUT FILE NAME
+
+OUTPUT_MODEL=$(cat output_file_name)
+
+echo OUTPUT_MODEL = $OUTPUT_MODEL
+
+# REMOVE output_file_name
+
+rm $WORKING_DIR/output_file_name
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+if [ -f $WORKING_DIR/print_file ]; then
+	mv $WORKING_DIR/print_file     $WORKING_DIR/$OUTPUT_MODEL".print"
+fi
+
+if [ -f $WORKING_DIR/punch_file ]; then
+	mv $WORKING_DIR/punch_file     $WORKING_DIR/$OUTPUT_MODEL".model"
+fi
+
+if [ -f $WORKING_DIR/surf_file ]; then
+	mv $WORKING_DIR/surf_file      $WORKING_DIR/$OUTPUT_MODEL".surf"
+fi
+
+echo -ne '\a'
+

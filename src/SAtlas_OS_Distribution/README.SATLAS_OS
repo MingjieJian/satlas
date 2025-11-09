@@ -1,0 +1,19 @@
+2015 JUNE
+
+The program SAtlas_OS is a spherical version of the plane-parallel 
+Atlas_OS, which is a modified version of the Atlas12 code created by 
+Robert Kurucz.  See the file README.ATLAS_OS for a brief description of
+the modifications.
+
+The fundamental atmospheric parameters are now: mass, luminosity and 
+radius.  These can be specified in either solar units or absolute units.
+
+Unlike Atlas_OS, there is only one radiative transfer routine, which is
+George Rybicki's restructuring of the Feautrier method.
+
+The run script run_satlas_os manages the execution of the code and links
+to the input model and the line lists.  It also renames the output files
+to identify them with the luminosity, mass and radius of the model 
+being calculated.  The run script also adds the metallicity and 
+microturbulence of the starting model to the output files.
+

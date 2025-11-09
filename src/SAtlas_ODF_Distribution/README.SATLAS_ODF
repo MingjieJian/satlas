@@ -1,0 +1,98 @@
+2017 JULY
+
+The program satlas_odf is a spherical version of the plane-parallel code
+atlas_odf, which is a modified version of the atlas9 code created by 
+Robert Kurucz.  See the file README.ATLAS_ODF for a brief description of
+the modifications.
+
+CODE ORGANIZATION
+
+As with atlas_odf, the satlas_odf program is divided into a number of
+smaller files, such as satlas_odf_main.f, satlas_odf_read.f, ...   
+These files can be edited without needing to work with the whole code.  
+Similarly, the common statements in the original atlas9 code have all 
+been replaced by modules that can be edited once and then included
+everywhere they are used.  
+
+Unlike atlas_odf, there is only one radiative transfer routine, which is
+Rybicki's restructuring of the Feautrier method.
+
+MAKEFILE
+
+The various components of satlas_odf mentions above can be edited 
+individually, then compiled into the executable file satlas_odf.exe by 
+using the Makefile in the distribution with the command 
+	make satlas_odf
+Only those files that have been changed are recompiled and then linked 
+to the other files that were not changed.  There are many compiler 
+options, but only a few have been set in the Makefile.
+
+FUNDAMENTAL PARAMETERS
+
+The fundamental parameters for a spherical stellar atmosphere are 
+luminosity, mass and radius.  These can be specified in any order and 
+using either solar units or cgs units.  The starting model is often a 
+plane-parallel model from the grids of Kurucz or Castelli.  To choose a
+starting model, compile and run the program predict_starting_model.exe, 
+which asks for the spectral type and luminosity class of the star being 
+modeled.  It uses tables from Astrophysical Quantities to estimate the 
+Teff and log g that match the spectral type and luminosity.  It also 
+estimates the matching luminosity, mass and radius of the spherical model.
+These values can be scaled to the parameters of the desired model.
+
+OPACITY DISTRIBUTION FUNCTIONS
+
+The opacity distribution functions (odfs) are local copies of the odfs 
+from the web site of Fiorella Castelli (recommended by Kurucz).  The
+Castelli ODFs have 25 pressures, 57 temperatures and 12 steps for each 
+wavelength.  These pressure and temperature dimensions are different 
+from the dimensions of the Kurucz ODFs.
+
+The Castelli binary odf files use 2-byte integer arrays written with an
+explicit order for the indices.  For example, the Castelli odf are 
+written with this loop:
+   do itt = 1, 57
+      write(2) ((kap(ip, itt, istep), istep = 1, 12), ip = 1, 25)
+   end do
+
+In satlas_odf the original Castelli odfs are converted to array element 
+order, which is the approach used by Kurucz, in which the odf at each
+wavelength is read with the command
+   read(9, rec = iwl) kap2(1:np_odf, 1:nt_odf, 1:12)
+The Fortran standard does not specify how each compiler has to implement 
+array element order, but each compiler does it in a consistent way.  The
+approach used in satlas_odf is to read in the original Castelli odf 
+using the explicit ordering and convert the odf to array element order 
+in the subprogram open_odf, which is internal to the readin subprogram.
+
+There are several options for using the odf files:
+   1) if the "big" odf is used, the wavelength bands are larger, so 
+      there are fewer wavelength steps, and the whole odf is small 
+      enough to fit into memory.  Both Kurucz and Castelli have codes 
+      named atlas9mem.for that employ this approach.
+   2) if the "lit" odf is used, the wavelength bands are smaller, so 
+      there are more wavelength steps.  This makes the whole ode too 
+      large to fit into memory, so it must be read from disk as the 
+      calculation progresses.  Both Kurucz and Castelli have codes named
+      atlas9v.for that employ this approach.
+   3) Kurucz has a third version, called just atlas9.for, which includes
+      the options of atlas9mem and atlas9v, but also have the option 
+      of either interpolating in the odf files for a constant value of 
+      the turbulent velocity that differs from the values used in the 
+      ODFs, which are 0, 1, 2, 4, and 8 km/s, or interpolating a 
+      turbulent velocity that varies with depth.
+
+The satlas_odf code follows the approach found in Kurucz's atlas9.for 
+and has subroutines that can use the "big" odf's in memory, the "lit" 
+odfs on disk, or interpolate in the odfs.
+
+RUNNING SATLAS_ODF
+
+The script run_satlas_odf manages the execution of the code and links to
+the input model and opacity distribution function(s).  It also renames 
+the output files to identify them with the luminosity, mass and radius 
+of the model being calculated.  The run script included the composition 
+and the microturbulence of the model in the output file names.  The run 
+script included in the distribution must be edited to change the 
+directories to the actual directories being used.
+

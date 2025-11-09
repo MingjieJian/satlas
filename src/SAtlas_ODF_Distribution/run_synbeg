@@ -1,0 +1,61 @@
+#! /bin/bash
+########################### RUN SCRIPT FOR SYNBEG ######################
+# INPUT TO THE SCRIPT: 1 = WAVE
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+LIST_DIR=/home/pub/Llists
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS ARE GIVEN
+
+if [ $# -lt 1 ]; then
+	echo "USAGE:   run_synbeg starting wave = label"
+	echo "EXAMPLE: run_synbeg 0500 - NB 4 digits"
+	exit 1
+else
+	WAVE=$1
+fi
+
+# ESTABLISH SYMBOLIC LINKS
+
+LIST_FILES=`(cd $LIST_DIR; ls *.bin)`
+
+for file in $LIST_FILES
+	do ln -s $LIST_DIR/$file        $WORKING_DIR/$file
+done
+
+# ESTABLISH THIS LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/synbeg.exe      $WORKING_DIR/synbeg.exe
+fi
+
+# NOTE, THIS ASSUMES THAT A COPY OF THE INPUTFILE IS IN THE DIRECTORY 
+# FROM WHICH THIS SCRIPT IS BEING RUN
+
+cp $WORKING_DIR/synbeg.inputfile        $WORKING_DIR/synbeg.input
+
+# EXECUTION
+
+$WORKING_DIR/synbeg.exe
+
+# REMOVE THE SYMBOLIC LINKS
+
+rm $WORKING_DIR/synbeg.input
+
+for file in $LIST_FILES
+	do rm $WORKING_DIR/$file
+done
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/synbeg.exe
+fi
+
+echo -ne '\a'
+

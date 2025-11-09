@@ -1,0 +1,87 @@
+# THE ORDER OF THESE COMMANDS DOES NOT MATTER.
+# THE CORRECT ORDER IS SET IN SYNBEG
+# A LINE LIST CAN BE TURNED OFF BY # IN THE FIRST COLUMN
+#
+# THE BEGINNING AND ENDING WAVELENGTHS IN NM
+#
+wlbeg  400.0
+wlend  450.0
+#
+# DEFAULT if_vac = .true. SET IN module_synbeg_syndat.for
+# THEREFORE, NO COMMAND IS NEEDED FOR VACUUM WAVELENGTHS
+# OR, USE COMMAND vacuum on OR vacuum true TO SET if_vac = .true.
+# USE COMMAND vacuum off OR vacuum false TO SET if_vac = .false.
+#
+vacuum off
+#
+# DEFAULT pred_lines = .false. SET IN module_synbeg_syndat.for
+# COMMAND predict USES ALL LINES, INCLUDING THOSE WITH ONLY PREDICTED ENERGY LEVELS
+#
+# predicted
+#
+# ATOMIC/IONIC LINES
+#
+read   gfall      #      1.8348 nm -  999999.9999 nm        2017 OCT 8
+#
+# C2 LINE LISTS
+#
+read   c2ax       #    271.8071 nm -    9999.6289 nm
+read   c2ba       #    389.6061 nm -    9999.9646 nm
+read   c2da       #    344.9621 nm -    2176.1773 nm
+read   c2ea       #    176.0052 nm -     862.4585 nm
+#
+# CH LINE LISTS
+#
+read   chax       #    302.1839 nm -    1706.8229 nm
+read   chbx       #    360.9278 nm -    1158.4156 nm
+read   chcx       #    255.8501 nm -     693.3123 nm
+#
+# CN LINE LISTS
+#
+read   cnax       #    292.5406 nm -   99924.784  nm
+read   cnbx       #    198.5939 nm -     806.5256 nm
+#
+# CO LINE LISTS
+#
+read   coax       #    111.3365 nm -     460.6524 nm
+read   coxx       #    963.5106 nm -    9998.0259 nm
+#
+# H2 LINE LISTS
+#
+read   h2bx       #     84.5005 nm -     184.4573 nm
+read   h2cx       #     84.4941 nm -     158.4068 nm
+read   h2xx       #    277.5161 nm -  200591.3966 nm
+read   hdxx       #    274.6034 nm - 3108605.     nm
+#
+# MgH LINE LISTS
+#
+read   mghax      #    375.8847 nm -     898.3785 nm
+read   mghbx      #    343.6794 nm -     829.1935 nm
+#
+# NH LINE LIST
+#
+read   nh         #    228.7760 nm -     691.8382 nm
+#
+# OH LINE LIST
+#
+read   ohnew      #    203.6264 nm -   99968.4875 nm
+#
+# SiH LINE LIST
+#
+read   sihax      #    326.8045 nm -    3245.1715 nm
+#
+# SiO LINE LISTS
+#
+read   sioax      #    177.3128 nm -     546.2833 nm
+read   sioex      #    143.0468 nm -     462.4214 nm
+read   sioxx      #   2051.7902 nm -   99966.7137 nm
+#
+# read tio15
+#
+# TIO - SCHWENKE'S DATA
+#
+read tioschwenke  #    340.1112 nm -   99999.7158 nm
+#
+# END INSTRUCTIONS AND START READING THE LINE LISTS
+#
+begin

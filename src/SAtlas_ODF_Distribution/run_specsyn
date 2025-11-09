@@ -1,0 +1,83 @@
+#! /bin/bash
+########################### RUN SCRIPT FOR SPECSYN #####################
+# INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+#MODEL_DIR=/home/pub/Grids/Castelli
+#MODEL_DIR=/home/pub/Grids/Kurucz
+MODEL_DIR=$(pwd)
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo "USAGE:   run_specsyn model-name             wave-label"
+	echo "EXAMPLE: run_specsyn ap00k2_L150_M1.0_R25.0 0500 - NB 4 digits"
+	exit 1
+else
+	MODEL=$1
+	WAVE=$2
+	MODEL_WAVE=$1"_w"$2
+fi
+
+# IF NEEDED, ESTABLISH THESE SYMBOLIC LINKS
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/specsyn.exe           $WORKING_DIR/specsyn.exe
+	ln -s $CODE_DIR/molecules.dat         $WORKING_DIR/molecules.dat
+fi
+
+ln -s $MODEL_DIR/$MODEL".mdl"                 $WORKING_DIR/model_file
+ln -s $WORKING_DIR/xnfpelsyn_file20.$MODEL    $WORKING_DIR/xnfpelsyn.file20
+ln -s $WORKING_DIR/synthe_file30.$MODEL_WAVE  $WORKING_DIR/synthe.file30
+
+# NOTE, THIS ASSUMES THAT A COPY OF THE INPUTFILE IS IN THE 
+# DIRECTORY FROM WHICH THIS SCRIPT IS BEING RUN
+
+cp $WORKING_DIR/specsyn.inputfile             $WORKING_DIR/specsyn.input
+
+# EXECUTION
+
+$WORKING_DIR/specsyn.exe
+
+# REMOVE THESE SYMBOLIC LINKS, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/specsyn.exe
+	rm $WORKING_DIR/molecules.dat
+fi
+
+# REMOVE THESE SYMBOLIC LINKS
+rm $WORKING_DIR/specsyn.input
+rm $WORKING_DIR/model_file
+rm $WORKING_DIR/xnfpelsyn.file20
+rm $WORKING_DIR/synthe.file30
+
+# READ TYPE OF RADIATION
+
+RAD_TYPE=$(cat rad_type)
+
+echo RADIATION TYPE = $RAD_TYPE
+
+rm $WORKING_DIR/rad_type
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+if [ -f $WORKING_DIR/specsyn.print ]; then
+	mv $WORKING_DIR/specsyn.print   $WORKING_DIR/specsyn_print.$MODEL_WAVE$RAD_TYPE
+fi
+
+if [ -f $WORKING_DIR/specsyn.file31 ]; then
+	mv $WORKING_DIR/specsyn.file31  $WORKING_DIR/specsyn_file31.$MODEL_WAVE$RAD_TYPE
+fi
+
+if [ -f $WORKING_DIR/specsyn.file32 ]; then
+	mv $WORKING_DIR/specsyn.file32  $WORKING_DIR/specsyn_file32.$MODEL_WAVE$RAD_TYPE
+fi
+
+echo -ne '\a'
+

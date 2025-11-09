@@ -1,0 +1,192 @@
+#! /bin/bash
+##################### RUN SCRIPT FOR ROTATE #####################
+# INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+#MODEL_DIR=/home/pub/Grids/Castelli
+#MODEL_DIR=/home/pub/Grids/Kurucz
+MODEL_DIR=$(pwd)
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo "USAGE:   run_rotate model_name             wave"
+	echo "EXAMPLE: run_rotate ap00k2_L1.00_M1.0_R1.0 0500 - NOTE 4 digit wavelength"
+	exit 1
+else
+	MODEL_WAVE=$1"_w"$2
+fi
+
+# IF NEEDED, ESTABLISH THIS LINK
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/rotate.exe  $WORKING_DIR/rotate.exe
+fi
+
+# ESTABLISH SYMBOLIC LINKS
+
+SPECSYN31=$WORKING_DIR"/specsyn_file31."$MODEL_WAVE"_int"
+SPECSYN32=$WORKING_DIR"/specsyn_file32."$MODEL_WAVE"_int"
+
+ln -s $SPECSYN31  $WORKING_DIR/specsyn.file31
+ln -s $SPECSYN32  $WORKING_DIR/specsyn.file32
+
+# NOTE, THIS ASSUMES THAT A COPY OF THE INPUTFILE IS IN THE 
+# DIRECTORY FROM WHICH THIS SCRIPT IS BEING RUN
+
+ln -s $WORKING_DIR/rotate.inputfile  $WORKING_DIR/rotate.input
+
+# EXECUTION
+
+$WORKING_DIR/rotate.exe
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/rotate.exe
+fi
+
+# ALWAYS REMOVE THESE SYMBOLIC LINKS
+rm $WORKING_DIR/rotate.input
+rm $WORKING_DIR/specsyn.file3*
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+mv $WORKING_DIR/rotate.print    $WORKING_DIR/rotate_print.$MODEL_WAVE
+
+if [ -f $WORKING_DIR/rot_1 ]; then
+	VEL=$(cat vel_1)
+	mv $WORKING_DIR/rot_1   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_2 ]; then
+	VEL=$(cat vel_2)
+	mv $WORKING_DIR/rot_2   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_3 ]; then
+	VEL=$(cat vel_3)
+	mv $WORKING_DIR/rot_3   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_4 ]; then
+	VEL=$(cat vel_4)
+	mv $WORKING_DIR/rot_4   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_5 ]; then
+	VEL=$(cat vel_5)
+	mv $WORKING_DIR/rot_5   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_6 ]; then
+	VEL=$(cat vel_6)
+	mv $WORKING_DIR/rot_6   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_7 ]; then
+	VEL=$(cat vel_7)
+	mv $WORKING_DIR/rot_7   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_8 ]; then
+	VEL=$(cat vel_8)
+	mv $WORKING_DIR/rot_8   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_9 ]; then
+	VEL=$(cat vel_9)
+	mv $WORKING_DIR/rot_9   $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_10 ]; then
+	VEL=$(cat vel_10)
+	mv $WORKING_DIR/rot_10  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_11 ]; then
+	VEL=$(cat vel_11)
+	mv $WORKING_DIR/rot_11  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_12 ]; then
+	VEL=$(cat vel_12)
+	mv $WORKING_DIR/rot_12  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_13 ]; then
+	VEL=$(cat vel_13)
+	mv $WORKING_DIR/rot_13  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_14 ]; then
+	VEL=$(cat vel_14)
+	mv $WORKING_DIR/rot_14  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_15 ]; then
+	VEL=$(cat vel_15)
+	mv $WORKING_DIR/rot_15  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_16 ]; then
+	VEL=$(cat vel_16)
+	mv $WORKING_DIR/rot_16  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_17 ]; then
+	VEL=$(cat vel_17)
+	mv $WORKING_DIR/rot_17  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_18 ]; then
+	VEL=$(cat vel_18)
+	mv $WORKING_DIR/rot_18  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_19 ]; then
+	VEL=$(cat vel_19)
+	mv $WORKING_DIR/rot_19  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_20 ]; then
+	VEL=$(cat vel_20)
+	mv $WORKING_DIR/rot_20  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_21 ]; then
+	VEL=$(cat vel_21)
+	mv $WORKING_DIR/rot_21  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_22 ]; then
+	VEL=$(cat vel_22)
+	mv $WORKING_DIR/rot_22  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_23 ]; then
+	VEL=$(cat vel_23)
+	mv $WORKING_DIR/rot_23  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_24 ]; then
+	VEL=$(cat vel_24)
+	mv $WORKING_DIR/rot_24  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+if [ -f $WORKING_DIR/rot_25 ]; then
+	VEL=$(cat vel_25)
+	mv $WORKING_DIR/rot_25  $WORKING_DIR/rotate_$MODEL_WAVE$VEL
+fi
+
+# NOW REMOVE THE LABEL FILES
+
+rm $WORKING_DIR/vel_*
+
+echo -ne '\a'
+

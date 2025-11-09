@@ -1,0 +1,53 @@
+#! /bin/bash
+##################### RUN SCRIPT FOR LIST_LINES #####################
+# INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DIRECTORIES
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo "USAGE:   run_list_lines input_model           wave-label rad_type"
+	echo "EXAMPLE: run_list_lines ap00k2_L150_M1.00_R25 0500       flx OR int"
+	exit 1
+else
+	MODEL=$1
+	WAVE=$2
+	RAD=$3$
+	MODEL_WAVE_RAD=$1"_w"$2"_"$3
+fi
+
+# IF NEEDED, ESTABLISH THIS LINK
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/list_lines.exe             $WORKING_DIR/list_lines.exe
+fi
+
+# ESTABLISH SYMBOLIC LINKS
+
+ln -s $WORKING_DIR/specsyn_file31.$MODEL_WAVE_RAD  $WORKING_DIR/specsyn.file31
+ln -s $WORKING_DIR/specsyn_file32.$MODEL_WAVE_RAD  $WORKING_DIR/specsyn.file32
+
+# EXECUTION
+
+$WORKING_DIR/list_lines.exe
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/list_lines.exe
+fi
+
+rm $WORKING_DIR/specsyn.file31
+rm $WORKING_DIR/specsyn.file32
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+mv $WORKING_DIR/list_lines.print $WORKING_DIR/list_lines.$MODEL_WAVE_RAD
+
+echo -ne '\a'
+

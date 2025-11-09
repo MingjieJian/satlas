@@ -1,0 +1,52 @@
+#! /bin/bash
+##################### RUN SCRIPT FOR REFORM_ROT #####################
+# INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo "USAGE:   run_reform_rot model-name            wave-label      rot-label"
+	echo "EXAMPLE: run_reform_rot ap00k2_L150_M1.00_R25 0500 (4 digit)  +20.00"
+	exit 1
+else
+	MODEL=$1
+	WAVE=$2
+	MODEL_WAVE_ROT=$1"_w"$2"_rot"$3
+fi
+
+# IF NEEDED, ESTABLISH THIS LINK
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/reform_rot.exe       $WORKING_DIR/reform_rot.exe
+fi
+
+# ESTABLISH SYMBOLIC LINKS
+
+ln -s $WORKING_DIR/"rotate_"$MODEL_WAVE_ROT  $WORKING_DIR/rotate.file9
+
+# EXECUTION
+
+$WORKING_DIR/reform_rot.exe
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/reform_rot.exe
+fi
+
+# ALWAYS REMOVE THESE SYMBOLIC LINKS
+
+rm $WORKING_DIR/rotate.file9
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+mv $WORKING_DIR/reform_rot.print             $WORKING_DIR/reform_rot.$MODEL_WAVE_ROT
+
+echo -ne '\a'
+

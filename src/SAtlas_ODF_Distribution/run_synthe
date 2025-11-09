@@ -1,0 +1,81 @@
+#! /bin/bash
+########################### RUN SCRIPT FOR SYNTHE ######################
+# INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+POPS_DIR=$(pwd)
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo "USAGE:   run_synthe model-name             wave-label"
+	echo "EXAMPLE: run_synthe ap00k1_L1.00_M1.0_R1.0 0500 - NB 4 digit wl"
+	exit 1
+else
+	MODEL=$1
+	WAVE=$2
+	MODEL_WAVE=$1"_w"$2
+fi
+
+# ESTABLISH THESE LINKS, IF NEEDED
+
+if [ $WORKING_DIR !=  $CODE_DIR ]; then
+	ln -s $CODE_DIR/synthe.exe               $WORKING_DIR/synthe.exe
+fi
+
+ln -s $WORKING_DIR/synthe.inputfile              $WORKING_DIR/synthe.input
+
+if [ -f       $POPS_DIR/xnfpelsyn_file20.$MODEL ]; then
+	ln -s $POPS_DIR/xnfpelsyn_file20.$MODEL  $WORKING_DIR/xnfpelsyn.file20
+fi
+
+if [ -f       $WORKING_DIR/synbeg_file22.w$WAVE ]; then
+	ln -s $WORKING_DIR/synbeg_file22.w$WAVE  $WORKING_DIR/synbeg.file22
+fi
+
+if [ -f       $WORKING_DIR/synbeg_file23.w$WAVE ]; then
+	ln -s $WORKING_DIR/synbeg_file23.w$WAVE  $WORKING_DIR/synbeg.file23
+fi
+
+if [ -f       $WORKING_DIR/synbeg_file24.w$WAVE ]; then
+	ln -s $WORKING_DIR/synbeg_file24.w$WAVE  $WORKING_DIR/synbeg.file24
+fi
+
+# EXECUTION
+
+$WORKING_DIR/synthe.exe
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/synthe.exe
+fi
+
+rm $WORKING_DIR/synthe.input
+rm $WORKING_DIR/xnfpelsyn.file20
+
+if [ -f $WORKING_DIR/synbeg.file22 ]; then
+	rm $WORKING_DIR/synbeg.file22
+fi
+
+if [ -f $WORKING_DIR/synbeg.file23 ]; then
+	rm $WORKING_DIR/synbeg.file23
+fi
+
+if [ -f $WORKING_DIR/synbeg.file24 ]; then
+	rm $WORKING_DIR/synbeg.file24
+fi
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+mv $WORKING_DIR/synthe.print        $WORKING_DIR/synthe_print.$MODEL_WAVE
+
+mv $WORKING_DIR/synthe.file30       $WORKING_DIR/synthe_file30.$MODEL_WAVE
+
+echo -ne '\a'
+

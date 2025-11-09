@@ -1,0 +1,53 @@
+#! /bin/bash
+##################### RUN SCRIPT FOR REFORM_F #####################
+# INPUT TO THE SCRIPT: 1 = MODEL, 2 = WAVE
+
+# DIRECTORIES - EDIT TO AGREE WITH ACTUAL LOCATIONS
+
+CODE_DIR=/home/john.lester/Documents/SAtlas_ODF/Code
+
+WORKING_DIR=$(pwd)
+
+# TEST TO SEE IF THE CORRECT NUMBER OF ARGUMENTS IS GIVEN
+
+if [ $# -lt 2 ]; then
+	echo "USAGE:   run_reform_f model-name            wave-label"
+	echo "EXAMPLE: run_reform_f ap00k2_L150_M1.00_R25 0500 - NB 4 digits"
+	exit 1
+else
+	MODEL=$1
+	WAVE=$2
+	MODEL_WAVE=$1"_w"$2
+fi
+
+# IF NEEDED, ESTABLISH THIS LINK
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	ln -s $CODE_DIR/reform_f.exe           $WORKING_DIR/reform_f.exe
+fi
+
+# ESTABLISH SYMBOLIC LINKS
+
+ln -s $WORKING_DIR/specsyn_file31.$MODEL_WAVE"_flx"  $WORKING_DIR/specsyn.file31
+ln -s $WORKING_DIR/specsyn_file32.$MODEL_WAVE"_flx"  $WORKING_DIR/specsyn.file32
+
+# EXECUTION
+
+$WORKING_DIR/reform_f.exe
+
+# REMOVE THIS SYMBOLIC LINK, IF NEEDED
+
+if [ $WORKING_DIR != $CODE_DIR ]; then
+	rm $WORKING_DIR/reform_f.exe
+fi
+
+# ALWAYS REMOVE THESE SYMBOLIC LINKS
+
+rm $WORKING_DIR/specsyn.file3*
+
+# MOVE THE OUTPUT TO SPECIFIC FILES
+
+mv $WORKING_DIR/reform_f.print      $WORKING_DIR/reform_f.$MODEL_WAVE
+
+echo -ne '\a'
+

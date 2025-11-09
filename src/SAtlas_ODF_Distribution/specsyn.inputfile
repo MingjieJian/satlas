@@ -1,0 +1,22 @@
+# INPUT OF A PLANE-PARALLEL MODEL - ONLY FOR TESTING
+#luminosity 1.0
+#mass 1.0
+#radius 1.0
+#read pp_model
+# INPUT OF A SPHERICAL MODEL
+read sp_model
+opacity ifop 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0
+iterations 1
+# SURFACE INSTRUCTION MUST BE AFTER SPECIFYING THE NUMBER OF ITERATIONS
+surface flux 1
+#surface intensity 1
+#0 # IF THE FIRST NUMBER IS 0, THE PROGRAM USES THE DEFAULT MU VALUES
+#    IF THE FIRST NUMBER IS NOT 0, THE MU VALUES ARE INPUT
+#12 1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1 0.05 0.01
+print 0
+punch 0
+correction off
+#molecules off
+molecules on
+begin
+end

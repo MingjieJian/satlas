@@ -1,0 +1,9 @@
+Compiler Options
+
+The various programs are compiled using the Intel Fortran compiler.
+Each Makefile have the current compiler options used for the various 
+versions of Atlas and SAtlas.
+
+Programs that are used to prepare files for Atlas, such as line lists,
+are compiled with the alias "fort" which is defined to have these options
+alias fort     'ifort -assume byterecl -check -warn declarations -warn unused'
